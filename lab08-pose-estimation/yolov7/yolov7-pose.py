@@ -21,7 +21,7 @@ def pose_video(frame):
     img = torch.tensor(np.array([img.numpy()]))
     # Load the image into the computation device.
     img = img.to(device)
-    
+
     # Gradients are stored during training, not required while inference.
     with torch.no_grad():
         t1 = time.time()
@@ -34,7 +34,7 @@ def pose_video(frame):
                                          nc=1,   # Number of classes.
                                          nkpt=17, # Number of keypoints.
                                          kpt_label=True)
-        
+
         output = output_to_keypoint(output)
 
     # Change format [b, c, h, w] to [h, w, c] for displaying the image.
@@ -44,7 +44,7 @@ def pose_video(frame):
 
     for idx in range(output.shape[0]):
         plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-        
+
     return nimg, fps
 
 
@@ -87,7 +87,11 @@ h, w, _ = frame.shape
 #                       cv2.VideoWriter_fourcc(*'mp4v'), 
 #                       fps, (w, h))
 
-out = cv2.VideoWriter(f"{save_name}_yolo7.avi",cv2.VideoWriter_fourcc('M','J','P','G'), 10, w,h)
+save_name = file_name.split('.')[0]
+
+out = cv2.VideoWriter(f"{save_name}_yolo7.mp4",
+                      cv2.VideoWriter_fourcc(*'mp4v'),
+                      10, (input_size, input_size))
 
 #-------------------------------------------------------------------------------#
 
@@ -95,7 +99,7 @@ out = cv2.VideoWriter(f"{save_name}_yolo7.avi",cv2.VideoWriter_fourcc('M','J','P
 if __name__ == '__main__':
     while True:
         ret, frame = cap.read()
-        
+
         if not ret:
             print('Unable to read frame. Exiting ..')
             break
@@ -109,7 +113,7 @@ if __name__ == '__main__':
         out.write(img[...,::-1])
         key = cv2.waitKey(1)
         if key == ord('q'):
-        	break
+            break
 
     cap.release()
     out.release()
